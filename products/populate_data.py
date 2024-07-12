@@ -35,7 +35,6 @@ def populate_product_data_by_pandas():
     """
     # Iterate over the DataFrame rows
     for _, row in df.iterrows():
-        import pdb;pdb.set_trace()
         product_data = {
             'name': row['name'],
             'category': row['category'],
