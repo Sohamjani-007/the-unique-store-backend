@@ -9,21 +9,47 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
-
+import os
 from pathlib import Path
+import environ
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+# Initialize environment variables
+environ.Env.read_env(Path.joinpath(BASE_DIR, ".env"))  # noqa
+
+# let;s set the default values in case of these values doesn't;t exists in the
+# .env file
+# this will do the type casting as well.
+env = environ.Env(
+    # set casting, default value
+    DEBUG=(bool, False),
+    PRIMARY_DB=(dict, {}),
+    OTO_CORE_DB=(dict, {}),
+    PRIMARY_DATABASE_PORT=(int, 5432),
+    OTO_DATABASE_PORT=(int, 5432),
+    ENVIRONMENT=(str, "STAGE"),
+)
+
+# This will only thing people has to suppy to run the project default is stage/prod
+environment = env("ENVIRONMENT").upper()
+assert environment in [
+    "STAGE",
+    "PROD",
+], "Unsupported Environment Provided choices are [STAGE, PROD]..."
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-m-bt1pr#z##0e979h$18+gy&(ul@u=oefmma*w%(p0zp#8_pi&'
+SECRET_KEY = env("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env("DEBUG")
 
 ALLOWED_HOSTS = []
 
@@ -85,6 +111,18 @@ DATABASES = {
 }
 
 
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": env("DATABASE_NAME"),
+        "USER": env("DATABASE_USER"),
+        "PASSWORD": env("DATABASE_PASSWORD"),
+        "HOST": env("DATABASE_HOST"),
+        "PORT": env("DATABASE_PORT"),
+    },
+}
+
+
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
@@ -99,7 +137,7 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
@@ -130,6 +168,18 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # # Allow all origins for simplicity (adjust as per your deployment needs)
 # CORS_ALLOW_ALL_ORIGINS = True
 
+# SMTP Email settings
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"  # Use the correct SMTP server
+EMAIL_PORT = 587  # Common ports: 587 for TLS, 465 for SSL
+EMAIL_USE_TLS = True  # Use True for TLS, False for SSL
+EMAIL_HOST_USER = env(f"{environment}_EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = env(f"{environment}_EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = env(f"{environment}_DEFAULT_FROM_EMAIL")
+EMAIL_USE_SSL = False
+
+
+SITE_ID = 2
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:8080',  # Vue.js development server
