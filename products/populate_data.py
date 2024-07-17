@@ -1,6 +1,5 @@
 import pandas as pd
-from products.models import Product
-
+from products.models import Product, SaleItem
 
 # sample_products = [
 #     {'name': 'FABSPORTS USB Rechargeable Fancy Laser Lights, for Bicycles, Scooters, Skateboard etc Ideal Kids Gift, Accessories for Cycling, Safety Tail Light for Bicycle, Pack of 1', 'category': 'light', 'price': 1299.99, 'image': "https://m.media-amazon.com/images/I/71Qb30AHXzL._SX679_.jpg", "link" : "https://amzn.to/3xGUBYK"},
@@ -47,4 +46,31 @@ def populate_product_data_by_pandas():
             defaults=product_data
         )
 
+
+# Load the Excel file
+file_path = '/home/rithika/Downloads/mock_saleitem_data.xlsx'  # Replace with your file path
+df = pd.read_excel(file_path)
+
+# Check the structure of your DataFrame
+print(df.head())
+
+def populate_saleitem_data_by_pandas():
+    """
+    # Call the function to populate the product data
+    populate_product_data_by_pandas()
+    """
+    # Iterate over the DataFrame rows
+    for _, row in df.iterrows():
+        product_data = {
+            'name': row['name'],
+            'description': row['description'],
+            'original_price': row['original_price'],
+            'sale_price': row['sale_price'],
+            'image': row['image'],
+            'url': row['url']
+        }
+        SaleItem.objects.update_or_create(
+            name=product_data['name'],
+            defaults=product_data
+        )
 
