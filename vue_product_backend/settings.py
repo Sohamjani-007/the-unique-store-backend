@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 import os
 from pathlib import Path
 import environ
+import pathlib
+
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -19,7 +21,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # Initialize environment variables
-environ.Env.read_env(Path.joinpath(BASE_DIR, ".env"))  # noqa
+# environ.Env.read_env(Path.joinpath(BASE_DIR, ".env"))  # noqa
+
+environment = os.environ.get("ENVIRONMENT", "dev")
+environment = (environment or "").lower().replace(".", "")
+assert environment and environment in ["dev", "prod"], "VALID ENVIRONMENT OPTIONS ARE [DEV, PROD]"
+
+env_file_path = f".env.{environment}"
+
+assert pathlib.Path(env_file_path).exists(), f"Unable to locate the following file {env_file_path} in the project path"
+
+environ.Env.read_env(Path.joinpath(BASE_DIR, env_file_path))  # noqa
+
+
 
 # let;s set the default values in case of these values doesn't;t exists in the
 # .env file
@@ -51,7 +65,7 @@ SECRET_KEY = env("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env("DEBUG")
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -103,17 +117,17 @@ WSGI_APPLICATION = 'vue_product_backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "ENGINE": env("DATABASE_ENGINE"),
         "NAME": env("DATABASE_NAME"),
         "USER": env("DATABASE_USER"),
         "PASSWORD": env("DATABASE_PASSWORD"),
