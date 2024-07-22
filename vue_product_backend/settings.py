@@ -29,7 +29,7 @@ assert environment and environment in ["dev", "prod"], "VALID ENVIRONMENT OPTION
 
 env_file_path = f".env.{environment}"
 
-assert pathlib.Path(env_file_path).exists(), f"Unable to locate the following file {env_file_path} in the project path"
+# assert pathlib.Path(env_file_path).exists(), f"Unable to locate the following file {env_file_path} in the project path"
 
 environ.Env.read_env(Path.joinpath(BASE_DIR, env_file_path))  # noqa
 
@@ -50,10 +50,12 @@ env = environ.Env(
 
 # This will only thing people has to suppy to run the project default is stage/prod
 environment = env("ENVIRONMENT").upper()
-assert environment in [
-    "STAGE",
-    "PROD",
-], "Unsupported Environment Provided choices are [STAGE, PROD]..."
+
+print(environment)
+# assert environment in [
+#     "STAGE",
+#     "PROD",
+# ], "Unsupported Environment Provided choices are [STAGE, PROD]..."
 
 
 # Quick-start development settings - unsuitable for production
@@ -181,16 +183,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #
 # # Allow all origins for simplicity (adjust as per your deployment needs)
 # CORS_ALLOW_ALL_ORIGINS = True
-
-# SMTP Email settings
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "smtp.gmail.com"  # Use the correct SMTP server
-EMAIL_PORT = 587  # Common ports: 587 for TLS, 465 for SSL
-EMAIL_USE_TLS = True  # Use True for TLS, False for SSL
-EMAIL_HOST_USER = env(f"{environment}_EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = env(f"{environment}_EMAIL_HOST_PASSWORD")
-DEFAULT_FROM_EMAIL = env(f"{environment}_DEFAULT_FROM_EMAIL")
-EMAIL_USE_SSL = False
 
 
 SITE_ID = 2

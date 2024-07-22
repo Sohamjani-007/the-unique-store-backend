@@ -16,10 +16,18 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from django.views import View
+from django.http import HttpResponse
+
+
+class Ping(View):
+    def get(self, request):
+        return HttpResponse('pong')
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('ping', Ping.as_view(), name='ping'),
     path('', include('products.urls')),
 ]
 
