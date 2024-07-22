@@ -190,5 +190,6 @@ SITE_ID = 2
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:8080',  # Vue.js development server
     'http://127.0.0.1:8080',   # Alternative localhost address
+    "https://the-unique-store.pages.dev",
     # Add other origins as needed
 ]
